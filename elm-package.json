@@ -1,5 +1,5 @@
 {
-    "version": "0.0.1",
+    "version": "1.0.0",
     "summary": "An Elm library for lists with at least a single element.",
     "repository": "https://github.com/MichaelCombs28/unit-list.git",
     "license": "MIT",
