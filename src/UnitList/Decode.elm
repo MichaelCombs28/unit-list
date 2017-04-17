@@ -1,9 +1,18 @@
 module UnitList.Decode exposing (unitList)
 
-import UnitList exposing (UnitList, singleton)
+{-| A simple decoder for UnitList provided for convenience.
+
+# Decoder
+@docs unitList
+
+-}
+
+import UnitList exposing (UnitList)
 import Json.Decode as Json exposing (Decoder)
 
 
+{-|
+-}
 unitList : Decoder a -> Decoder (UnitList a)
 unitList =
-    Json.map singleton
+    Json.map UnitList.singleton
