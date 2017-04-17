@@ -267,7 +267,9 @@ previous ((UnitList past curr future) as ulist) =
 
 
 {-| Cycles forward or backward through the Unitlist,
-    if n == 0 then the identity is returned.
+    if n == 0 then the identity is returned. If there
+    are more elements than cycles, returns list at that
+    state.
 -}
 step : Int -> UnitList a -> UnitList a
 step n ulist =

@@ -4,34 +4,77 @@ import Test exposing (..)
 import Expect
 import Fuzz exposing (list, int, tuple, string)
 import String
+import UnitList exposing (..)
 
 
 all : Test
 all =
-    describe "Sample Test Suite"
-        [ describe "Unit test examples"
-            [ test "Addition" <|
+    describe "UnitList test suite"
+        [ describe "UnitList tests."
+            [ test "isSingleton" <|
                 \() ->
-                    Expect.equal (3 + 7) 10
-            , test "String.left" <|
+                    singleton 1
+                        |> push 2
+                        |> isSingleton
+                        |> Expect.false "Should be false."
+            , test "Initialize unitlist" <|
                 \() ->
-                    Expect.equal "a" (String.left 1 "abcdefg")
-            , test "This test should fail - you should remove it" <|
+                    singleton 0
+                        |> updateHistory (always [ 1, 2, 3, 4 ])
+                        |> initialize
+                        |> history
+                        |> Expect.equal []
+            , test "Archive unitlist" <|
                 \() ->
-                    Expect.fail "Failed as expected!"
-            ]
-        , describe "Fuzz test examples, using randomly generated input"
-            [ fuzz (list int) "Lists always have positive length" <|
-                \aList ->
-                    List.length aList |> Expect.atLeast 0
-            , fuzz (list int) "Sorting a list does not change its length" <|
-                \aList ->
-                    List.sort aList |> List.length |> Expect.equal (List.length aList)
-            , fuzzWith { runs = 1000 } int "List.member will find an integer in a list containing it" <|
-                \i ->
-                    List.member i [ i ] |> Expect.true "If you see this, List.member returned False!"
-            , fuzz2 string string "The length of a string equals the sum of its substrings' lengths" <|
-                \s1 s2 ->
-                    s1 ++ s2 |> String.length |> Expect.equal (String.length s1 + String.length s2)
+                    fromList 1 [ 2, 3, 4, 5 ]
+                        |> archive 6
+                        |> history
+                        |> Expect.equal [ 1, 2, 3, 4, 5 ]
+            , test "Next" <|
+                \() ->
+                    let
+                        ulist =
+                            fromList 1 [ 2, 3, 4, 5 ]
+                                |> next
+                    in
+                        fromList 2 [3,4,5]
+                            |> updateHistory (always [1])
+                            |> Expect.equal ulist
+
+            , test "Previous" <|
+                \() ->
+                    let
+                        ulist =
+                            fromList 1 [2,3,4,5]
+                                |> next
+                                |> previous
+                    in
+                        fromList 1 [2,3,4,5]
+                            |> Expect.equal ulist
+
+            , test "Step positive" <|
+                \() ->
+                    let
+                        ulist =
+                            fromList 1 [2,3,4,5]
+                                |> step 1
+                    in
+                        fromList 1 [2,3,4,5]
+                            |> next
+                            |> Expect.equal ulist
+
+            , test "Step negative" <|
+                \() ->
+                    let
+                        ulist =
+                            fromList 1 [2,3,4,5]
+                                |> updateHistory (always [3,1,2])
+                                |> step -1
+                    in
+                        fromList 1 [2,3,4,5]
+                            |> updateHistory (always [3,1,2])
+                            |> previous
+                            |> Expect.equal ulist
+
             ]
         ]
