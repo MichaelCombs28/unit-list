@@ -39,6 +39,7 @@ all =
                     in
                         fromList 2 [3,4,5]
                             |> updateHistory (always [1])
+                            |> Just
                             |> Expect.equal ulist
 
             , test "Previous" <|
@@ -47,9 +48,10 @@ all =
                         ulist =
                             fromList 1 [2,3,4,5]
                                 |> next
-                                |> previous
+                                |> Maybe.andThen previous
                     in
                         fromList 1 [2,3,4,5]
+                            |> Just
                             |> Expect.equal ulist
 
             , test "Step positive" <|

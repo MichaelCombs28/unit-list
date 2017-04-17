@@ -218,7 +218,7 @@ updateFuture f (UnitList a b c) =
 
 
 {-| Steps to the head of the future list unless it's
-empty which case the identity is returned.
+empty which case returns Nothing.
 
 ```
 singleton 1
@@ -227,14 +227,15 @@ singleton 1
 ```
 
 -}
-next : UnitList a -> UnitList a
+next : UnitList a -> Maybe(UnitList a)
 next ((UnitList past curr future) as ulist) =
     case future of
         [] ->
-            ulist
+            Nothing
 
         x :: xs ->
             UnitList (past ++ [ curr ]) x xs
+                |> Just
 
 
 {-| Cycles to the last element of the history
@@ -249,7 +250,7 @@ singleton 1
 ```
 
 -}
-previous : UnitList a -> UnitList a
+previous : UnitList a -> Maybe(UnitList a)
 previous ((UnitList past curr future) as ulist) =
     let
         past_ =
@@ -261,24 +262,26 @@ previous ((UnitList past curr future) as ulist) =
         case cur_ of
             a :: x ->
                 UnitList past_ a (curr :: future)
+                    |> Just
 
             _ ->
-                ulist
+                Nothing
 
 
 {-| Cycles forward or backward through the Unitlist,
-    if n == 0 then the identity is returned. If there
-    are more elements than cycles, returns list at that
-    state.
+    if n == 0 then the result is returned. If there
+    are more elements than cycles, nothing is returned.
 -}
-step : Int -> UnitList a -> UnitList a
+step : Int -> UnitList a -> Maybe(UnitList a)
 step n ulist =
     if n > 0 then
-        step (n - 1) <| next ulist
+        next ulist
+            |> Maybe.andThen (step (n - 1))
     else if n < 0 then
-        step (n + 1) <| previous ulist
+        previous ulist
+            |> Maybe.andThen (step (n + 1))
     else
-        ulist
+        Just ulist
 
 
 {-| Transforms the model leaving the structure intact.
